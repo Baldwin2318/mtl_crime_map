@@ -4,6 +4,7 @@ import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 
 // source data: https://donnees.montreal.ca/dataset/actes-criminels
+//              https://www.donneesquebec.ca/recherche/dataset/vmtl-actes-criminels/resource/c6f482bf-bf0f-4960-8b2f-9982c211addd?utm_source=chatgpt.com
 const URL = 'https://donnees.montreal.ca/dataset/5829b5b0-ea6f-476f-be94-bc2b8797769a/resource/aacc4576-97b3-4d8d-883d-22bbca41dbe6/download/actes-criminels.geojson'
 
 // Simple category translations (extend as needed)
