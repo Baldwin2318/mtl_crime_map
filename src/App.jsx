@@ -100,7 +100,7 @@ export default function App() {
         </div>
         <footer style={{ padding: 8, borderTop: '1px solid #ddd', fontSize: 12, textAlign: 'center' }}>
         Données sur la criminalité © Ville de Montréal / SPVM – « Actes criminels », 
-        licence CC BY 4.0. Visualisation par <b>Baldwin Malabanan</b>.
+        licence CC BY 4.0. Visualisation par <b><a href="https:www.linkedin.com/in/baldwinmalabanan">Baldwin Malabanan</a></b>.
         </footer>
 
         {err && (
