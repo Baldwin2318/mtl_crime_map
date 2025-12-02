@@ -119,3 +119,10 @@ export default function App() {
     </div>
   )
 }
+
+
+//NOTE
+/**
+ * To run the program and debug,
+ * run npm dev
+ */
