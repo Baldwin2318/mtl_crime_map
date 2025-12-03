@@ -45,12 +45,12 @@ export default function Chart({ data, category, onClose }) {
                 ]}
                 layout={{
                 title: { text: `${category} par mois`, font: { size: 20 },},
-                xaxis: { title: { text: 'Mois', font: { size: 14 }  } },
-                yaxis: { title: { text: category, font: { size: 14 }  } },
+                xaxis: { title: { text: 'Mois', font: { size: 14 }  }, automargin: true, },
+                yaxis: { title: { text: category, font: { size: 14 }  }, automargin: true, },
                 margin: { t: 40, l: 50, r: 20, b: 50 },
                 autosize: true,
                 }}
-                useResizeHandler
+                useResizeHandler={true}
                 style={{ width: '100%', height: '100%' }}
                 config={{ displayModeBar: false }}
             />
