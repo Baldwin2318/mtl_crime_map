@@ -49,7 +49,10 @@ export default function App() {
   }, [raw, category, year])
 
   // const label = (c) => `${translations[c] ?? c} (${c})` // e.g., "Motor vehicle theft (Vol de véhicule à moteur)"
- 
+
+  const tag = import.meta.env.VITE_GIT_TAG
+  const commit = import.meta.env.VITE_GIT_COMMIT
+  const build = import.meta.env.VITE_BUILD_DATE
   return (
     <div>
       <div style={{ position: 'fixed', display:'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999, backgroundColor: '#b6b6b6af', height: '100%', width: '100%', visibility: filtered ? 'hidden' : 'visible'}}>
@@ -100,7 +103,7 @@ export default function App() {
         </div>
         <footer style={{ padding: 8, borderTop: '1px solid #ddd', fontSize: 12, textAlign: 'center' }}>
         Données sur la criminalité © Ville de Montréal / SPVM – « Actes criminels », 
-        licence CC BY 4.0. Visualisation par <b>Baldwin Malabanan</b>.
+        licence CC BY 4.0. Visualisation par <b>Baldwin Malabanan</b>. {tag}
         </footer>
 
         {err && (

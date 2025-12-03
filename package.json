@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "VITE_GIT_TAG=$(git describe --tags --abbrev=0) VITE_GIT_COMMIT=$(git rev-parse --short HEAD) VITE_BUILD_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ) vite",
+    "build": "VITE_GIT_TAG=$(git describe --tags --abbrev=0) VITE_GIT_COMMIT=$(git rev-parse --short HEAD) VITE_BUILD_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ) vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
