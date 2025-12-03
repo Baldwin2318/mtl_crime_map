@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
+import Chart from './components/Chart'
 
 // source data: https://donnees.montreal.ca/dataset/actes-criminels
 //              https://www.donneesquebec.ca/recherche/dataset/vmtl-actes-criminels/resource/c6f482bf-bf0f-4960-8b2f-9982c211addd?utm_source=chatgpt.com
@@ -50,6 +51,8 @@ export default function App() {
 
   // const label = (c) => `${translations[c] ?? c} (${c})` // e.g., "Motor vehicle theft (Vol de véhicule à moteur)"
 
+  const [showChart, setShowChart] = useState(false)
+
   const tag = import.meta.env.VITE_GIT_TAG
   const commit = import.meta.env.VITE_GIT_COMMIT
   const build = import.meta.env.VITE_BUILD_DATE
@@ -76,6 +79,7 @@ export default function App() {
               {years.map(y => <option key={y} value={y}>{y}</option>)}
             </select>
           </label>
+          <button onClick={() => setShowChart(true)}>Show Chart</button>
           <span style={{ marginLeft: 'auto', fontSize: 13, color: '#555' }}>
             {filtered ? `${filtered.features.length.toLocaleString()} records` : ''}
           </span>
@@ -101,6 +105,10 @@ export default function App() {
             )}
           </MapContainer>
         </div>
+
+        {/* Overlays */}
+        {showChart && <Chart data={filtered} category={category} onClose={() => setShowChart(false)} />}
+
         <footer style={{ padding: 8, borderTop: '1px solid #ddd', fontSize: 12, textAlign: 'center' }}>
         Données sur la criminalité © Ville de Montréal / SPVM – « Actes criminels », 
         licence CC BY 4.0. Visualisation par <b>Baldwin Malabanan</b>. {tag}
