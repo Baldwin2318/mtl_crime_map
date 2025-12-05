@@ -6,7 +6,10 @@ import Chart from './components/Chart'
 
 // source data: https://donnees.montreal.ca/dataset/actes-criminels
 //              https://www.donneesquebec.ca/recherche/dataset/vmtl-actes-criminels/resource/c6f482bf-bf0f-4960-8b2f-9982c211addd?utm_source=chatgpt.com
-const URL = 'https://donnees.montreal.ca/dataset/5829b5b0-ea6f-476f-be94-bc2b8797769a/resource/aacc4576-97b3-4d8d-883d-22bbca41dbe6/download/actes-criminels.geojson'
+//              https://donnees.montreal.ca/dataset/limites-pdq-spvm
+const URL_DATA_CRIME = 'https://donnees.montreal.ca/dataset/5829b5b0-ea6f-476f-be94-bc2b8797769a/resource/aacc4576-97b3-4d8d-883d-22bbca41dbe6/download/actes-criminels.geojson'
+const URL_PDQ_1 = 'https://donnees.montreal.ca/dataset/186892b8-bba5-426c-aa7e-9db8c43cbdfe/resource/e18f0da9-3a16-4ba4-b378-59f698b47261/download/limitespdq.geojson'
+const URL_PDQ_2 = '/limitespdq_wgs84.geojson'
 
 export default function App() {
   const [raw, setRaw] = useState(null)
@@ -15,13 +18,15 @@ export default function App() {
   const [categories, setCategories] = useState([])
   const [years, setYears] = useState([])
   const [err, setErr] = useState(null)
+  const [pdq, setPdq] = useState(null)  
 
   // fetch ONCE
   useEffect(() => {
-    fetch(URL)
+    const promise_1 = fetch(URL_DATA_CRIME)
       .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json() })
       .then(json => {
         setRaw(json)
+        console.log(json)
         // build options dynamically so labels match accents exactly
         const cats = new Set()
         const yrs = new Set()
@@ -33,7 +38,15 @@ export default function App() {
         setCategories(Array.from(cats).sort((a,b)=>a.localeCompare(b)))
         setYears(Array.from(yrs).sort((a,b)=>Number(b)-Number(a)))
       })
-      .catch(e => setErr(e.message))
+      
+    const promise_2 = fetch(URL_PDQ_2)
+      .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json() })
+      .then(json => {
+        setPdq(json)
+      })
+    
+    var Promise1 = Promise.all(promise_1) //.catch(e => setErr(e.message))
+    var Promise2 = Promise.all(promise_2) //.catch(e => setErr(e.message))
   }, [])
 
   // filter in memory
@@ -50,6 +63,7 @@ export default function App() {
   }, [raw, category, year])
 
   const [showChart, setShowChart] = useState(false)
+  const [showPDQ, setShowPDQ] = useState(false)
 
   const tag = import.meta.env.VITE_GIT_TAG
   const commit = import.meta.env.VITE_GIT_COMMIT
@@ -78,6 +92,7 @@ export default function App() {
             </select>
           </label>
           <button onClick={() => setShowChart(true)}>Show Chart</button>
+          <button onClick={() => setShowPDQ(v => !v)}>{showPDQ ? "Disable PDQ" : "Enable PDQ"}</button>
           <span style={{ marginLeft: 'auto', fontSize: 13, color: '#555' }}>
             {filtered ? `${filtered.features.length.toLocaleString()} records` : ''}
           </span>
@@ -98,6 +113,27 @@ export default function App() {
                   layer.bindPopup(
                     `<b>${eng}</b><br><small>${p.CATEGORIE}</small><br>${p.DATE || ''} — ${p.QUART || ''}<br>PDQ: ${p.PDQ || '—'}`
                   )
+                }}
+              />
+            )}
+
+            {showPDQ && pdq && (
+              <GeoJSON
+                data={pdq}
+                style={() => ({
+                  weight: 1,
+                  color: '#333',
+                  fillOpacity: 0,     
+                })}
+                onEachFeature={(feature, layer) => {
+                  const id = feature?.properties?.PDQ
+                  if (id != null) {
+                    layer.bindTooltip(String(id), {
+                      permanent: true,
+                      direction: 'center',
+                      className: 'pdq-label',  
+                    })
+                  }
                 }}
               />
             )}
