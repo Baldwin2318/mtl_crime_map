@@ -126,5 +126,5 @@ export default function App() {
 //NOTE
 /**
  * To run the program and debug,
- * run npm dev
+ * npm run dev
  */
