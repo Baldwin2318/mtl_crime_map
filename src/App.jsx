@@ -49,8 +49,6 @@ export default function App() {
     return { type: 'FeatureCollection', features: feats }
   }, [raw, category, year])
 
-  // const label = (c) => `${translations[c] ?? c} (${c})` // e.g., "Motor vehicle theft (Vol de véhicule à moteur)"
-
   const [showChart, setShowChart] = useState(false)
 
   const tag = import.meta.env.VITE_GIT_TAG
