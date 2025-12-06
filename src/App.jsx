@@ -32,7 +32,6 @@ export default function App() {
       .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json() })
       .then(json => {
         setRaw(json)
-        console.log(json)
         // build options dynamically so labels match accents exactly
         const cats = new Set()
         const yrs = new Set()
