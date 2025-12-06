@@ -126,8 +126,8 @@ export default function App() {
               {years.map(y => <option key={y} value={y}>{y}</option>)}
             </select>
           </label>
-          <button onClick={() => setShowChart(true)}>Show Chart</button>
-          <button onClick={() => setShowPDQ(v => !v)}>{showPDQ ? "Disable PDQ" : "Enable PDQ"}</button>
+          <button onClick={() => setShowPDQ(v => !v)}>{showPDQ ? "Cacher layer" : "Afficher layer"}</button>
+          <button onClick={() => setShowChart(true)} style={{ background: 'blue', color: 'white'}}>Chart</button>
           <span style={{ marginLeft: 'auto', fontSize: 13, color: '#555' }}>
             {filtered ? `${filtered.features.length.toLocaleString()} records` : ''}
           </span>
