@@ -11,6 +11,9 @@ const URL_DATA_CRIME = 'https://donnees.montreal.ca/dataset/5829b5b0-ea6f-476f-b
 const URL_PDQ_1 = 'https://donnees.montreal.ca/dataset/186892b8-bba5-426c-aa7e-9db8c43cbdfe/resource/e18f0da9-3a16-4ba4-b378-59f698b47261/download/limitespdq.geojson'
 const URL_PDQ_2 = '/limitespdq_wgs84.geojson'
 
+const PDQ_BASE_STYLE = { weight: 1, color: '#333', fillOpacity: 0, }
+const PDQ_HOVER_STYLE = {  weight: 3, color: '#2563eb', fillOpacity: 0.8, }
+
 export default function App() {
   const [raw, setRaw] = useState(null)
   const [category, setCategory] = useState('Vol de véhicule à moteur') // default car theft
@@ -68,6 +71,7 @@ export default function App() {
   const tag = import.meta.env.VITE_GIT_TAG
   const commit = import.meta.env.VITE_GIT_COMMIT
   const build = import.meta.env.VITE_BUILD_DATE
+
   return (
     <div>
       <div style={{ position: 'fixed', display:'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999, backgroundColor: '#b6b6b6af', height: '100%', width: '100%', visibility: filtered ? 'hidden' : 'visible'}}>
@@ -106,7 +110,7 @@ export default function App() {
               <GeoJSON
                 key={`${category}-${year}-${filtered.features.length}`} 
                 data={filtered}
-                pointToLayer={(_, latlng) => L.circleMarker(latlng, { radius: 5 })}
+                pointToLayer={(_, latlng) => L.circleMarker(latlng, { radius: 2, color: '#ff1010ff' })}
                 onEachFeature={(f, layer) => {
                   const p = f.properties || {}
                   const eng = p.CATEGORIE
@@ -120,23 +124,34 @@ export default function App() {
             {showPDQ && pdq && (
               <GeoJSON
                 data={pdq}
-                style={() => ({
-                  weight: 1,
-                  color: '#333',
-                  fillOpacity: 0,     
-                })}
+                style={() => PDQ_BASE_STYLE}
                 onEachFeature={(feature, layer) => {
-                  const id = feature?.properties?.PDQ
-                  if (id != null) {
-                    layer.bindTooltip(String(id), {
-                      permanent: true,
-                      direction: 'center',
-                      className: 'pdq-label',  
-                    })
-                  }
+                  // const id = feature?.properties?.PDQ
+                  // if (id != null) {
+                  //   layer.bindTooltip(String(id), {
+                  //     permanent: true,
+                  //     direction: 'center',
+                  //     className: 'pdq-label',
+                  //   })
+                  // }
+
+                  layer.on({
+                    mouseover: (e) => {
+                      e.target.setStyle(PDQ_HOVER_STYLE)
+                      if (e.target.bringToFront) e.target.bringToFront()
+                      const map = e.target._map
+                      if (map) map.getContainer().style.cursor = 'pointer'
+                    },
+                    mouseout: (e) => {
+                      e.target.setStyle(PDQ_BASE_STYLE)
+                      const map = e.target._map
+                      if (map) map.getContainer().style.cursor = ''
+                    },
+                  })
                 }}
               />
             )}
+
           </MapContainer>
         </div>
 
