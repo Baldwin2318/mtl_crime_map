@@ -1,5 +1,7 @@
-import { Atom } from "react-loading-indicators";
+import { ThreeDot } from "react-loading-indicators";
 
-const Loading = () => <Atom color="#ffffffff" size="medium" text="Loading" textColor="" />
+// source: https://react-loading-indicators.netlify.app
+
+const Loading = () => <ThreeDot variant="brick-stack" color="#ffff" size="medium" text="loading" textColor="" />
 
 export default Loading;
