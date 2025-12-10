@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
+import Chart from './components/Chart'
 import Loading from './components/Loading.jsx'
 
 // source data: https://donnees.montreal.ca/dataset/actes-criminels
