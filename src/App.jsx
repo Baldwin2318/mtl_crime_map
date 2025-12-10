@@ -105,115 +105,144 @@ export default function App() {
   const build = import.meta.env.VITE_BUILD_DATE
 
   return (
-    <div>
+    <div className="relative h-screen">
+      {/* Loading overlay */}
       <div className={`fixed inset-0 z-[999] flex items-center justify-center bg-[#b6b6b6af] ${filtered ? 'invisible' : 'visible'}`}>
-        <Loading/>
+        <Loading />
       </div>
-      <div className="h-screen grid grid-rows-[auto_1fr_auto]">
-        {/* Controls */}
-        <div className="p-2 border-b border-gray-300 flex gap-3 items-center">
+
+      {/* Map full-screen background */}
+      <MapContainer className="h-full w-full z-0" center={[45.55, -73.65]} zoom={11}>
+        <TileLayer attribution="© OpenStreetMap" url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
+
+        {filtered && (
+          <GeoJSON
+            key={`${category}-${year}-${filtered.features.length}`}
+            data={filtered}
+            pointToLayer={(_, latlng) =>
+              L.circleMarker(latlng, { radius: 2, color: '#ff1010ff' })
+            }
+            onEachFeature={(f, layer) => {
+              const p = f.properties || {}
+              const eng = p.CATEGORIE
+              layer.bindPopup(
+                `<b>${eng}</b><br><small>${p.CATEGORIE}</small><br>${p.DATE || ''} — ${p.QUART || ''}<br>PDQ: ${p.PDQ || '—'}`
+              )
+            }}
+          />
+        )}
+
+        {showPDQ && pdq && (
+          <GeoJSON
+            key={`pdq-${category}-${year}`}
+            data={pdq}
+            style={() => PDQ_BASE_STYLE}
+            onEachFeature={(feature, layer) => {
+              const id = feature?.properties?.PDQ
+              const key = id != null ? String(id) : null
+              const count = key ? (countsByPdq[key] || 0) : 0
+              const pdqName = key ? pdqNames[key] : null
+
+              if (key) {
+                layer.bindTooltip(
+                  `
+                    PDQ ${key}${pdqName ? ` – ${pdqName}` : ''}<br/>
+                    ${count.toLocaleString()} acte(s) pour « ${category} »
+                  `,
+                  {
+                    permanent: false,
+                    direction: 'center',
+                    className: 'pdq-label',
+                  }
+                )
+              }
+
+              layer.on({
+                mouseover: (e) => {
+                  e.target.setStyle(PDQ_HOVER_STYLE)
+                  if (e.target.bringToFront) e.target.bringToFront()
+                  const map = e.target._map
+                  if (map) map.getContainer().style.cursor = 'pointer'
+                },
+                mouseout: (e) => {
+                  e.target.setStyle(PDQ_BASE_STYLE)
+                  const map = e.target._map
+                  if (map) map.getContainer().style.cursor = ''
+                },
+              })
+            }}
+          />
+        )}
+      </MapContainer>
+
+      {/* Header overlay */}
+      <header className="pointer-events-none absolute inset-x-0 top-0 z-10">
+        <div className="m-2 flex items-stretch gap-3 rounded-lg border border-gray-300 mask-alpha px-3 py-2 shadow backdrop-blur-sm pointer-events-auto">
           <label>
             Catégorie:{' '}
-            <select className='w-30' value={category} onChange={e => setCategory(e.target.value)}>
-              {categories.map(c => <option key={c} value={c}>{c}</option>)}
+            <select className="w-30" value={category} onChange={e => setCategory(e.target.value)}>
+              {categories.map(c => (
+                <option key={c} value={c}>{c}</option>
+              ))}
             </select>
           </label>
+
           <label>
             Année:{' '}
             <select value={year} onChange={e => setYear(e.target.value)}>
               {!years.includes(String(new Date().getFullYear())) && (
-                <option value={String(new Date().getFullYear())}>{String(new Date().getFullYear())}</option>
+                <option value={String(new Date().getFullYear())}>
+                  {String(new Date().getFullYear())}
+                </option>
               )}
-              {years.map(y => <option key={y} value={y}>{y}</option>)}
+              {years.map(y => (
+                <option key={y} value={y}>{y}</option>
+              ))}
             </select>
           </label>
-          <button className='bg-indigo-500 hover:bg-fuchsia-500 text-white rounded-xl p-2' onClick={() => setShowPDQ(v => !v)}>{showPDQ ? "Cacher layer" : "Afficher layer"}</button>
-          <button className='bg-indigo-500 hover:bg-fuchsia-500 text-white rounded-xl p-2' onClick={() => setShowChart(true)}>Chart</button>
+
+          <button
+            className="bg-indigo-500 hover:bg-fuchsia-500 text-white rounded-xl px-3 py-2 text-sm"
+            onClick={() => setShowPDQ(v => !v)}>
+            {showPDQ ? 'Cacher layer' : 'Afficher layer'}
+          </button>
+
+          <button
+            className="bg-indigo-500 hover:bg-fuchsia-500 text-white rounded-xl px-3 py-2 text-sm h-full"
+            onClick={() => setShowChart(true)}>
+            Chart
+          </button>
+
           <span className="ml-auto text-[13px] text-[#555]">
             {filtered ? `${filtered.features.length.toLocaleString()} records` : ''}
           </span>
         </div>
+      </header>
 
-        {/* Map */}
-        <div className="h-full">
-          <MapContainer center={[45.55, -73.65]} zoom={11} className="h-full w-full">
-            <TileLayer attribution="© OpenStreetMap" url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-            {filtered && (
-              <GeoJSON
-                key={`${category}-${year}-${filtered.features.length}`} 
-                data={filtered}
-                pointToLayer={(_, latlng) => L.circleMarker(latlng, { radius: 2, color: '#ff1010ff' })}
-                onEachFeature={(f, layer) => {
-                  const p = f.properties || {}
-                  const eng = p.CATEGORIE
-                  layer.bindPopup(
-                    `<b>${eng}</b><br><small>${p.CATEGORIE}</small><br>${p.DATE || ''} — ${p.QUART || ''}<br>PDQ: ${p.PDQ || '—'}`
-                  )
-                }}
-              />
-            )}
+      {/* Chart overlay (assuming your Chart already renders as an overlay/modal) */}
+      {showChart && (
+        <Chart
+          data={filtered}
+          category={category}
+          onClose={() => setShowChart(false)}
+        />
+      )}
 
-            {showPDQ && pdq && (
-              <GeoJSON
-                key={`pdq-${category}-${year}`} 
-                data={pdq}
-                style={() => PDQ_BASE_STYLE}
-                onEachFeature={(feature, layer) => {
-                  const id = feature?.properties?.PDQ
-                  const key = id != null ? String(id) : null
-                  const count = key ? (countsByPdq[key] || 0) : 0
-                  const pdqName = key ? pdqNames[key] : null 
-
-                  if (key) {
-                    layer.bindTooltip(
-                      `
-                        PDQ ${key}${pdqName ? ` – ${pdqName}` : ''}<br/>
-                        ${count.toLocaleString()} acte(s) pour « ${category} »
-                      `,
-                      {
-                        permanent: false,
-                        direction: 'center',
-                        className: 'pdq-label',
-                      }
-                    )
-                  }
-
-                  layer.on({
-                    mouseover: (e) => {
-                      e.target.setStyle(PDQ_HOVER_STYLE)
-                      if (e.target.bringToFront) e.target.bringToFront()
-                      const map = e.target._map
-                      if (map) map.getContainer().style.cursor = 'pointer'
-                    },
-                    mouseout: (e) => {
-                      e.target.setStyle(PDQ_BASE_STYLE)
-                      const map = e.target._map
-                      if (map) map.getContainer().style.cursor = ''
-                    },
-                  })
-                }}
-              />
-            )}
-
-          </MapContainer>
+      <footer className="pointer-events-none absolute inset-x-0 bottom-0 z-10">
+        <div className="m-2 rounded-lg border border-gray-300 mask-alpha px-3 py-2 text-[12px] text-center shadow backdrop-blur-sm pointer-events-auto">
+          Données sur la criminalité © Ville de Montréal / SPVM – « Actes criminels », 
+          licence CC BY 4.0. Visualisation par <b>Baldwin Malabanan</b>. {tag}
         </div>
+      </footer>
 
-        {/* Overlays */}
-        {showChart && <Chart data={filtered} category={category} onClose={() => setShowChart(false)} />}
-
-        <footer className="p-2 border-t border-gray-300 text-[12px] text-center">
-        Données sur la criminalité © Ville de Montréal / SPVM – « Actes criminels », 
-        licence CC BY 4.0. Visualisation par <b>Baldwin Malabanan</b>. {tag}
-        </footer>
-
-        {err && (
-          <div className="absolute top-2 left-2 bg-red-100 text-red-800 px-3 py-1.5 rounded-lg text-sm">{String(err)}</div>
-        )}
-      </div>
+      {err && (
+        <div className="absolute top-2 left-2 z-20 bg-red-100 text-red-800 px-3 py-1.5 rounded-lg text-sm shadow">
+          {String(err)}
+        </div>
+      )}
     </div>
   )
 }
-
 
 //NOTE
 /**
