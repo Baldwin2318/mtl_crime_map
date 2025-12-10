@@ -16,6 +16,7 @@
     "react-dom": "^19.1.1",
     "react-leaflet": "^5.0.0",
     "react-leaflet-cluster": "^4.0.0",
+    "react-loading-indicators": "^1.0.1",
     "react-plotly.js": "^2.6.0"
   },
   "devDependencies": {
