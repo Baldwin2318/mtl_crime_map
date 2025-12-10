@@ -106,15 +106,15 @@ export default function App() {
 
   return (
     <div>
-      <div style={{ position: 'fixed', display:'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999, backgroundColor: '#b6b6b6af', height: '100%', width: '100%', visibility: filtered ? 'hidden' : 'visible'}}>
+      <div className={`fixed inset-0 z-[999] flex items-center justify-center bg-[#b6b6b6af] ${filtered ? 'invisible' : 'visible'}`}>
         <Loading/>
       </div>
-      <div style={{ height: '100vh', display: 'grid', gridTemplateRows: 'auto 1fr auto' }}>
+      <div className="h-screen grid grid-rows-[auto_1fr_auto]">
         {/* Controls */}
-        <div style={{ padding: 8, borderBottom: '1px solid #ddd', display: 'flex', gap: 12, alignItems: 'center' }}>
+        <div className="p-2 border-b border-gray-300 flex gap-3 items-center">
           <label>
             Catégorie:{' '}
-            <select value={category} onChange={e => setCategory(e.target.value)}>
+            <select className='w-30' value={category} onChange={e => setCategory(e.target.value)}>
               {categories.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </label>
@@ -127,16 +127,16 @@ export default function App() {
               {years.map(y => <option key={y} value={y}>{y}</option>)}
             </select>
           </label>
-          <button onClick={() => setShowPDQ(v => !v)}>{showPDQ ? "Cacher layer" : "Afficher layer"}</button>
-          <button onClick={() => setShowChart(true)} style={{ background: 'blue', color: 'white'}}>Chart</button>
-          <span style={{ marginLeft: 'auto', fontSize: 13, color: '#555' }}>
+          <button className='bg-indigo-500 hover:bg-fuchsia-500 text-white rounded-xl p-2' onClick={() => setShowPDQ(v => !v)}>{showPDQ ? "Cacher layer" : "Afficher layer"}</button>
+          <button className='bg-indigo-500 hover:bg-fuchsia-500 text-white rounded-xl p-2' onClick={() => setShowChart(true)}>Chart</button>
+          <span className="ml-auto text-[13px] text-[#555]">
             {filtered ? `${filtered.features.length.toLocaleString()} records` : ''}
           </span>
         </div>
 
         {/* Map */}
-        <div style={{ height: '100%' }}>
-          <MapContainer center={[45.55, -73.65]} zoom={11} style={{ height: '100%', width: '100%' }}>
+        <div className="h-full">
+          <MapContainer center={[45.55, -73.65]} zoom={11} className="h-full w-full">
             <TileLayer attribution="© OpenStreetMap" url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
             {filtered && (
               <GeoJSON
@@ -201,13 +201,13 @@ export default function App() {
         {/* Overlays */}
         {showChart && <Chart data={filtered} category={category} onClose={() => setShowChart(false)} />}
 
-        <footer style={{ padding: 8, borderTop: '1px solid #ddd', fontSize: 12, textAlign: 'center' }}>
+        <footer className="p-2 border-t border-gray-300 text-[12px] text-center">
         Données sur la criminalité © Ville de Montréal / SPVM – « Actes criminels », 
         licence CC BY 4.0. Visualisation par <b>Baldwin Malabanan</b>. {tag}
         </footer>
 
         {err && (
-          <div style={{ position: 'absolute', top: 8, left: 8, background: '#fee2e2', color: '#991b1b', padding: '6px 10px', borderRadius: 8 }}>{String(err)}</div>
+          <div className="absolute top-2 left-2 bg-red-100 text-red-800 px-3 py-1.5 rounded-lg text-sm">{String(err)}</div>
         )}
       </div>
     </div>
