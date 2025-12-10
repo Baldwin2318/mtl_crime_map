@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
-import Chart from './components/Chart'
+import Loading from './components/Loading.jsx'
 
 // source data: https://donnees.montreal.ca/dataset/actes-criminels
 //              https://www.donneesquebec.ca/recherche/dataset/vmtl-actes-criminels/resource/c6f482bf-bf0f-4960-8b2f-9982c211addd?utm_source=chatgpt.com
@@ -106,7 +106,7 @@ export default function App() {
   return (
     <div>
       <div style={{ position: 'fixed', display:'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999, backgroundColor: '#b6b6b6af', height: '100%', width: '100%', visibility: filtered ? 'hidden' : 'visible'}}>
-        Chargement...
+        <Loading/>
       </div>
       <div style={{ height: '100vh', display: 'grid', gridTemplateRows: 'auto 1fr auto' }}>
         {/* Controls */}
