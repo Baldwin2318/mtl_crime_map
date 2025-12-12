@@ -179,7 +179,7 @@ export default function App() {
       <header className="pointer-events-none absolute inset-x-0 top-0 z-10">
         <div className="m-2 flex items-stretch gap-3 rounded-lg border border-gray-300 mask-alpha px-3 py-2 shadow backdrop-blur-sm pointer-events-auto">
           <label>
-            Catégorie:{' '}
+            {/* Catégorie:{' '} */}
             <select className="w-30" value={category} onChange={e => setCategory(e.target.value)}>
               {categories.map(c => (
                 <option key={c} value={c}>{c}</option>
@@ -188,7 +188,7 @@ export default function App() {
           </label>
 
           <label>
-            Année:{' '}
+            {/* Année:{' '} */}
             <select value={year} onChange={e => setYear(e.target.value)}>
               {!years.includes(String(new Date().getFullYear())) && (
                 <option value={String(new Date().getFullYear())}>
@@ -202,13 +202,13 @@ export default function App() {
           </label>
 
           <button
-            className="bg-indigo-500 hover:bg-fuchsia-500 text-white rounded-xl px-3 py-2 text-sm"
+            className="bg-blue-500 hover:bg-blue-900 text-white rounded-xl px-3 text-sm"
             onClick={() => setShowPDQ(v => !v)}>
             {showPDQ ? 'Cacher layer' : 'Afficher layer'}
           </button>
 
           <button
-            className="bg-indigo-500 hover:bg-fuchsia-500 text-white rounded-xl px-3 py-2 text-sm h-full"
+            className="bg-blue-500 hover:bg-blue-900 text-white rounded-xl px-3 text-sm"
             onClick={() => setShowChart(true)}>
             Chart
           </button>
@@ -218,6 +218,10 @@ export default function App() {
           </span>
         </div>
       </header>
+    
+      <label className=" rounded-lg border border-gray-300 mask-alpha text-gray-500 backdrop-blur-sm pointer-events-none absolute p-1 top-10 m-5 z-10">
+        {category.toUpperCase()} {year}
+        </label>
 
       {/* Chart overlay (assuming your Chart already renders as an overlay/modal) */}
       {showChart && (
