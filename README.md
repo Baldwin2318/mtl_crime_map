@@ -1,16 +1,56 @@
-# React + Vite
+# mtl_map_crime
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interactive Montreal crime map built with React, Vite, Leaflet, and Plotly.
 
-Currently, two official plugins are available:
+## What It Does
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Loads Montreal crime data from the public GeoJSON source
+- Displays crime intensity as aggregated PDQ shaded areas instead of exact incident points
+- Filters by crime category and year
+- Shows PDQ hover details with incident count and share of the filtered total
+- Opens a chart modal with monthly counts
+- Supports comparing the selected year with the previous year in the chart modal
+- Shows a bilingual reminder modal on refresh
+- Uses a streamed fetch with progress tracking for the main crime dataset
 
-## React Compiler
+## Notes
 
-The React Compiler is not enabled on this template. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- The app fetches the full remote crime GeoJSON in the browser on load
+- The loading overlay uses real byte progress when the source provides `Content-Length`
+- If the source does not provide total size, the loader falls back to a generic progress state
+- Crime polygons are rendered from the local WGS84 PDQ boundary file in `public/limitespdq_wgs84.geojson`
 
-## Expanding the ESLint configuration
+## Development
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Install dependencies:
+
+```bash
+npm install
+```
+
+Run the dev server:
+
+```bash
+npm run dev
+```
+
+Create a production build:
+
+```bash
+npm run build
+```
+
+Preview the production build:
+
+```bash
+npm run preview
+```
+
+## Data Sources
+
+- Crime data: Ville de Montreal / SPVM `actes-criminels.geojson`
+- PDQ boundaries: local WGS84 GeoJSON derived from Montreal PDQ boundary data
+
+## Current Tradeoff
+
+The app currently prioritizes direct public-data loading over cached or preprocessed data. That keeps the dataset source simple, but the initial load can still be slow because the browser downloads and parses the full GeoJSON file.
