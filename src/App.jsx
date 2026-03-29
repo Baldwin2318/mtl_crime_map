@@ -15,8 +15,6 @@ const URL_PDQ = '/limitespdq_wgs84.geojson'
 const PDQ_BASE_STYLE = { weight: 3, color: '#333333ff', dashArray: '4 4', fill: true, fillOpacity: 0 };
 const PDQ_HOVER_STYLE = { weight: 4, color: '#1d4ed8', dashArray: '', fill: true, fillOpacity: 0.82 }
 
-const IS_WEB_APP = true;
-
 function getPdqFillColor(count, maxCount) {
   if (!count || !maxCount) return '#e5e7eb'
 
