@@ -2,6 +2,8 @@
 
 Interactive Montreal crime map built with React, Vite, Leaflet, and Plotly.
 
+![mtl_map_crime screenshot](./SC1.png)
+
 ## What It Does
 
 - Loads Montreal crime data from the public GeoJSON source
@@ -11,7 +13,7 @@ Interactive Montreal crime map built with React, Vite, Leaflet, and Plotly.
 - Opens a chart modal with monthly counts
 - Supports comparing the selected year with the previous year in the chart modal
 - Shows a bilingual reminder modal on refresh
-- Uses a streamed fetch with progress tracking for the main crime dataset
+- Uses a streamed fetch with real byte-progress tracking for the main crime dataset when available
 
 ## Notes
 
@@ -19,6 +21,7 @@ Interactive Montreal crime map built with React, Vite, Leaflet, and Plotly.
 - The loading overlay uses real byte progress when the source provides `Content-Length`
 - If the source does not provide total size, the loader falls back to a generic progress state
 - Crime polygons are rendered from the local WGS84 PDQ boundary file in `public/limitespdq_wgs84.geojson`
+- The chart modal lets users change category and year, and optionally compare the selected year with the previous year
 
 ## Development
 
