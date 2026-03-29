@@ -11,6 +11,7 @@ import Loading from './components/Loading.jsx'
 //              https://donnees.montreal.ca/dataset/carte-postes-quartier
 const URL_DATA_CRIME = 'https://donnees.montreal.ca/dataset/5829b5b0-ea6f-476f-be94-bc2b8797769a/resource/aacc4576-97b3-4d8d-883d-22bbca41dbe6/download/actes-criminels.geojson'
 const URL_PDQ = '/limitespdq_wgs84.geojson'
+const REPO_URL = 'https://github.com/Baldwin2318/mtl_crime_map'
 
 const PDQ_BASE_STYLE = { weight: 3, color: '#333333ff', dashArray: '4 4', fill: true, fillOpacity: 0 };
 const PDQ_HOVER_STYLE = { weight: 4, color: '#1d4ed8', dashArray: '', fill: true, fillOpacity: 0.82 }
@@ -347,9 +348,19 @@ export default function App() {
       )}
 
       <footer className="pointer-events-none absolute inset-x-0 bottom-0 z-10">
-        <div className="m-2 rounded-lg border border-gray-300 mask-alpha px-3 py-2 text-[12px] text-center shadow backdrop-blur-sm pointer-events-auto">
-          Données sur la criminalité © Ville de Montréal / SPVM – « Actes criminels », 
-          licence CC BY 4.0. {tag}
+        <div className="m-2 flex items-center justify-between gap-3 rounded-lg border border-gray-300 mask-alpha px-3 py-2 text-[12px] shadow backdrop-blur-sm pointer-events-auto">
+          <span className="text-center">
+            Données sur la criminalité © Ville de Montréal / SPVM – « Actes criminels », 
+            licence CC BY 4.0. {tag}
+          </span>
+          <a
+            href={REPO_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="rounded-lg bg-blue-500 px-3 py-1.5 text-white transition hover:bg-blue-900"
+          >
+            View Repo
+          </a>
         </div>
       </footer>
 
