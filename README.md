@@ -2,7 +2,7 @@
 
 Interactive Montreal crime map built with React, Vite, Leaflet, and Plotly.
 
-![mtl_map_crime screenshot](./SC1.png)
+![mtl_map_crime screenshot](./SCREENSHOTS/SC1.png)
 
 ## What It Does
 
