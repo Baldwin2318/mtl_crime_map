@@ -41,6 +41,45 @@ function getPdqHoverStyle(count, maxCount) {
   }
 }
 
+async function fetchJsonWithProgress(url, onProgress) {
+  const response = await fetch(url)
+  if (!response.ok) throw new Error(`HTTP ${response.status}`)
+
+  const totalBytes = Number(response.headers.get('content-length')) || 0
+  const reader = response.body?.getReader()
+
+  if (!reader) {
+    const json = await response.json()
+    onProgress({ percent: null, loadedBytes: totalBytes || 0, totalBytes, phase: 'done' })
+    return json
+  }
+
+  const decoder = new TextDecoder()
+  const chunks = []
+  let loadedBytes = 0
+
+  while (true) {
+    const { done, value } = await reader.read()
+    if (done) break
+
+    loadedBytes += value.byteLength
+    chunks.push(decoder.decode(value, { stream: true }))
+
+    const roundedPercent = totalBytes ? Math.floor((loadedBytes / totalBytes) * 100) : null
+    onProgress({
+      percent: roundedPercent != null ? Math.min(100, roundedPercent) : null,
+      loadedBytes,
+      totalBytes,
+      phase: 'downloading',
+    })
+  }
+
+  chunks.push(decoder.decode())
+  onProgress({ percent: 100, loadedBytes, totalBytes, phase: 'parsing' })
+
+  return JSON.parse(chunks.join(''))
+}
+
 export default function App() {
   const [raw, setRaw] = useState(null)
   const [category, setCategory] = useState('Vol de véhicule à moteur') // default car theft
@@ -49,11 +88,30 @@ export default function App() {
   const [years, setYears] = useState([])
   const [err, setErr] = useState(null)
   const [pdq, setPdq] = useState(null)  
+  const [crimeLoadProgress, setCrimeLoadProgress] = useState({ percent: null, phase: 'loading' })
+
+  function updateCrimeLoadProgress(nextProgress) {
+    setCrimeLoadProgress((current) => {
+      const nextPercent = nextProgress.percent == null ? null : Math.max(
+        current.percent ?? 0,
+        Math.round(nextProgress.percent)
+      )
+
+      if (current.percent === nextPercent && current.phase === nextProgress.phase) {
+        return current
+      }
+
+      return {
+        ...current,
+        ...nextProgress,
+        percent: nextPercent,
+      }
+    })
+  }
 
   // fetch ONCE
   useEffect(() => {
-    const promise_1 = fetch(URL_DATA_CRIME)
-      .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json() })
+    const promise_1 = fetchJsonWithProgress(URL_DATA_CRIME, updateCrimeLoadProgress)
       .then(json => {
         setRaw(json)
         // build options dynamically so labels match accents exactly
@@ -70,6 +128,10 @@ export default function App() {
         setCategories(sortedCategories)
         setYears(sortedYears)
         setYear(currentYear => currentYear || sortedYears[0] || '')
+        setCrimeLoadProgress({ percent: 100, phase: 'done' })
+      })
+      .catch(error => {
+        setErr(`Crime data load failed: ${error.message}`)
       })
       
     const promise_2 = fetch(URL_PDQ)
@@ -77,9 +139,11 @@ export default function App() {
       .then(json => {
         setPdq(json)
       })
-    
-    var Promise1 = Promise.all(promise_1) //.catch(e => setErr(e.message))
-    var Promise2 = Promise.all(promise_2) //.catch(e => setErr(e.message))
+      .catch(error => {
+        setErr(current => current || `PDQ data load failed: ${error.message}`)
+      })
+
+    Promise.allSettled([promise_1, promise_2])
   }, [])
 
   // filter in memory
@@ -126,12 +190,15 @@ export default function App() {
   const tag = import.meta.env.VITE_GIT_TAG
   const commit = import.meta.env.VITE_GIT_COMMIT
   const build = import.meta.env.VITE_BUILD_DATE
+  const loadingText = crimeLoadProgress.percent != null
+    ? `Chargement ${Math.round(crimeLoadProgress.percent)}%`
+    : (crimeLoadProgress.phase === 'parsing' ? 'Traitement des donnees...' : 'Chargement...')
 
   return (
     <div className="relative h-screen">
       {/* Loading overlay */}
-      <div className={`fixed inset-0 z-[999] flex items-center justify-center bg-[#b6b6b6af] ${filtered ? 'invisible' : 'visible'}`}>
-        <Loading />
+      <div className={`fixed inset-0 z-[999] flex items-center justify-center bg-[#b6b6b6af] ${(filtered || err) ? 'invisible' : 'visible'}`}>
+        <Loading text={loadingText} percent={crimeLoadProgress.percent} />
       </div>
 
       {/* Map full-screen background */}
