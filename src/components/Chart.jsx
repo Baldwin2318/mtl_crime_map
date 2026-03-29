@@ -29,7 +29,7 @@ export default function Chart({ data, category, onClose }) {
   if (!data || !data.features) return null
 
   return (
-    <div style={{ position: 'fixed', inset: 0,  zIndex: 1000, backgroundColor: 'rgba(0, 0, 0, 0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', }} >
+    <div style={{ position: 'fixed', inset: 0,  zIndex: 1000, backgroundColor: '#b6b6b6af', display: 'flex', alignItems: 'center', justifyContent: 'center', }} >
       <div style={{ background: '#fff', borderRadius: 8, padding: 16, maxWidth: '90vw',  maxHeight: '90vh', width: 800, boxShadow: '0 10px 25px rgba(0,0,0,0.2)', display: 'flex', flexDirection: 'column', }}>
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
           <button onClick={onClose} style={{ border: 'none', background: 'transparent', fontSize: 18, cursor: 'pointer', }} >×</button>
