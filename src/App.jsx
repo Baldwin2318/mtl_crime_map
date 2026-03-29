@@ -116,7 +116,12 @@ export default function App() {
 
   const [showChart, setShowChart] = useState(false)
   const [showPDQ, setShowPDQ] = useState(true)
+  const [showDisclaimer, setShowDisclaimer] = useState(true)
   const totalFilteredRecords = filtered?.features?.length || 0
+
+  function handleDismissDisclaimer() {
+    setShowDisclaimer(false)
+  }
 
   const tag = import.meta.env.VITE_GIT_TAG
   const commit = import.meta.env.VITE_GIT_COMMIT
@@ -248,10 +253,37 @@ export default function App() {
         />
       )}
 
+      {showDisclaimer && (
+        <div className="absolute inset-0 z-[1001] flex items-center justify-center bg-[#b6b6b6af] px-4">
+          <div className="max-w-md rounded-xl border border-gray-300 bg-white p-5 shadow-xl">
+            <h2 className="mb-2 text-lg font-semibold text-gray-900">Reminder / Avis</h2>
+            <p className="mb-3 text-sm text-gray-700">
+              Cette application web est un projet personnel de visualisation et d'exploration.
+            </p>
+            <p className="mb-4 text-sm text-gray-700">
+              Les donnees proviennent de sources publiques et peuvent etre incompletes, retardees ou comporter des erreurs. Ne l'utilisez pas comme source officielle ou operationnelle.
+            </p>
+            <div className="my-4 border-t border-gray-300" />
+            <p className="mb-3 text-sm italic text-gray-700">
+              This web app is a personal project for visualization and exploration.
+            </p>
+            <p className="mb-4 text-sm italic text-gray-700">
+              The data comes from public sources and may be incomplete, delayed, or contain errors. Do not use it as an official or operational source.
+            </p>
+            <button
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
+              onClick={handleDismissDisclaimer}
+            >
+              Continue / Continuer
+            </button>
+          </div>
+        </div>
+      )}
+
       <footer className="pointer-events-none absolute inset-x-0 bottom-0 z-10">
         <div className="m-2 rounded-lg border border-gray-300 mask-alpha px-3 py-2 text-[12px] text-center shadow backdrop-blur-sm pointer-events-auto">
           Données sur la criminalité © Ville de Montréal / SPVM – « Actes criminels », 
-          licence CC BY 4.0. Visualisation par <b>Baldwin Malabanan</b>. {tag}
+          licence CC BY 4.0. {tag}
         </div>
       </footer>
 
