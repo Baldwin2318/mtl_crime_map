@@ -213,12 +213,6 @@ export default function App() {
 
           <button
             className="bg-blue-500 hover:bg-blue-900 text-white rounded-xl px-3 text-sm"
-            onClick={() => setShowPDQ(v => !v)}>
-            {showPDQ ? 'Masquer PDQ' : 'Afficher PDQ'}
-          </button>
-
-          <button
-            className="bg-blue-500 hover:bg-blue-900 text-white rounded-xl px-3 text-sm"
             onClick={() => setShowChart(true)}>
             Chart
           </button>
@@ -247,8 +241,13 @@ export default function App() {
       {/* Chart overlay (assuming your Chart already renders as an overlay/modal) */}
       {showChart && (
         <Chart
-          data={filtered}
+          rawData={raw}
           category={category}
+          categories={categories}
+          year={year}
+          years={years}
+          onCategoryChange={setCategory}
+          onYearChange={setYear}
           onClose={() => setShowChart(false)}
         />
       )}
