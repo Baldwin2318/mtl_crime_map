@@ -17,6 +17,17 @@ const URL_PDQ_NAME = 'https://montreal-prod.storage.googleapis.com/resources/c9d
 const PDQ_BASE_STYLE = { weight: 3, color: '#333333ff', dashArray: '4 4', fillOpacity: 0, };
 const PDQ_HOVER_STYLE = {  weight: 3, color: '#2563eb', fillOpacity: 0.8, }
 
+function getPdqFillColor(count, maxCount) {
+  if (!count || !maxCount) return '#e5e7eb'
+
+  const intensity = count / maxCount
+  if (intensity > 0.8) return '#7f1d1d'
+  if (intensity > 0.6) return '#b91c1c'
+  if (intensity > 0.4) return '#dc2626'
+  if (intensity > 0.2) return '#f87171'
+  return '#fecaca'
+}
+
 export default function App() {
   const [raw, setRaw] = useState(null)
   const [category, setCategory] = useState('Vol de véhicule à moteur') // default car theft
@@ -97,8 +108,13 @@ export default function App() {
     return map
   }, [filtered])
 
+  const maxPdqCount = useMemo(() => {
+    const values = Object.values(countsByPdq)
+    return values.length ? Math.max(...values) : 0
+  }, [countsByPdq])
+
   const [showChart, setShowChart] = useState(false)
-  const [showPDQ, setShowPDQ] = useState(false)
+  const [showPDQ, setShowPDQ] = useState(true)
 
   const tag = import.meta.env.VITE_GIT_TAG
   const commit = import.meta.env.VITE_GIT_COMMIT
@@ -115,28 +131,20 @@ export default function App() {
       <MapContainer className="h-full w-full z-0" center={[45.55, -73.65]} zoom={11}>
         <TileLayer attribution="© OpenStreetMap" url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
 
-        {filtered && (
-          <GeoJSON
-            key={`${category}-${year}-${filtered.features.length}`}
-            data={filtered}
-            pointToLayer={(_, latlng) =>
-              L.circleMarker(latlng, { radius: 2, color: '#ff1010ff' })
-            }
-            onEachFeature={(f, layer) => {
-              const p = f.properties || {}
-              const eng = p.CATEGORIE
-              layer.bindPopup(
-                `<b>${eng}</b><br><small>${p.CATEGORIE}</small><br>${p.DATE || ''} — ${p.QUART || ''}<br>PDQ: ${p.PDQ || '—'}`
-              )
-            }}
-          />
-        )}
-
         {showPDQ && pdq && (
           <GeoJSON
             key={`pdq-${category}-${year}`}
             data={pdq}
-            style={() => PDQ_BASE_STYLE}
+            style={(feature) => {
+              const key = feature?.properties?.PDQ != null ? String(feature.properties.PDQ) : null
+              const count = key ? (countsByPdq[key] || 0) : 0
+
+              return {
+                ...PDQ_BASE_STYLE,
+                fillOpacity: count ? 0.65 : 0.2,
+                fillColor: getPdqFillColor(count, maxPdqCount),
+              }
+            }}
             onEachFeature={(feature, layer) => {
               const id = feature?.properties?.PDQ
               const key = id != null ? String(id) : null
@@ -159,13 +167,20 @@ export default function App() {
 
               layer.on({
                 mouseover: (e) => {
-                  e.target.setStyle(PDQ_HOVER_STYLE)
+                  e.target.setStyle({
+                    ...PDQ_HOVER_STYLE,
+                    fillColor: getPdqFillColor(count, maxPdqCount),
+                  })
                   if (e.target.bringToFront) e.target.bringToFront()
                   const map = e.target._map
                   if (map) map.getContainer().style.cursor = 'pointer'
                 },
                 mouseout: (e) => {
-                  e.target.setStyle(PDQ_BASE_STYLE)
+                  e.target.setStyle({
+                    ...PDQ_BASE_STYLE,
+                    fillOpacity: count ? 0.65 : 0.2,
+                    fillColor: getPdqFillColor(count, maxPdqCount),
+                  })
                   const map = e.target._map
                   if (map) map.getContainer().style.cursor = ''
                 },
@@ -204,7 +219,7 @@ export default function App() {
           <button
             className="bg-blue-500 hover:bg-blue-900 text-white rounded-xl px-3 text-sm"
             onClick={() => setShowPDQ(v => !v)}>
-            {showPDQ ? 'Cacher layer' : 'Afficher layer'}
+            {showPDQ ? 'Masquer PDQ' : 'Afficher PDQ'}
           </button>
 
           <button
@@ -221,7 +236,18 @@ export default function App() {
     
       <label className=" rounded-lg border border-gray-300 mask-alpha text-gray-500 backdrop-blur-sm pointer-events-none absolute p-1 top-10 m-5 z-10">
         {category.toUpperCase()} {year}
-        </label>
+      </label>
+
+      {showPDQ && (
+        <div className="absolute right-3 bottom-16 z-10 rounded-lg border border-gray-300 bg-white/85 px-3 py-2 text-xs shadow backdrop-blur-sm">
+          <div className="mb-2 font-semibold text-gray-700">Incidents par PDQ</div>
+          <div className="space-y-1 text-gray-600">
+            <div className="flex items-center gap-2"><span className="inline-block h-3 w-3 rounded-sm" style={{ backgroundColor: '#fecaca' }} /> Faible</div>
+            <div className="flex items-center gap-2"><span className="inline-block h-3 w-3 rounded-sm" style={{ backgroundColor: '#dc2626' }} /> Moyen</div>
+            <div className="flex items-center gap-2"><span className="inline-block h-3 w-3 rounded-sm" style={{ backgroundColor: '#7f1d1d' }} /> Elevé</div>
+          </div>
+        </div>
+      )}
 
       {/* Chart overlay (assuming your Chart already renders as an overlay/modal) */}
       {showChart && (
