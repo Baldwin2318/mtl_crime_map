@@ -10,12 +10,10 @@ import Loading from './components/Loading.jsx'
 //              https://donnees.montreal.ca/dataset/limites-pdq-spvm
 //              https://donnees.montreal.ca/dataset/carte-postes-quartier
 const URL_DATA_CRIME = 'https://donnees.montreal.ca/dataset/5829b5b0-ea6f-476f-be94-bc2b8797769a/resource/aacc4576-97b3-4d8d-883d-22bbca41dbe6/download/actes-criminels.geojson'
-const URL_PDQ_1 = 'https://donnees.montreal.ca/dataset/186892b8-bba5-426c-aa7e-9db8c43cbdfe/resource/e18f0da9-3a16-4ba4-b378-59f698b47261/download/limitespdq.geojson'
-const URL_PDQ_2 = '/limitespdq_wgs84.geojson'
-const URL_PDQ_NAME = 'https://montreal-prod.storage.googleapis.com/resources/c9d0b8d6-c7a6-4766-a5cc-98e8b1392bbc/pdq.geojson?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=test-datapusher-delete%40amplus-data.iam.gserviceaccount.com%2F20251206%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20251206T154115Z&X-Goog-Expires=604800&X-Goog-SignedHeaders=host&x-goog-signature=32295069d98f111f332922f27e717291a89f2c1f1ba0686d79a278128d2e63c78a85db266135d75ec2248840bc187c3d8bd5b86cffc3dadb3b258fbabb8a65cbfd85d73eab454627b9b7006c441a3ba929083d99287e3756dc335d287d24c9946b5838cfc6bd492520ceca3a6652ff58475f8419d3bd9c59ea7124e99ee520408d0abec98ee343f6dc6aad3e28f1969ec29769826de5a070a4c30b0f794c12189b3659dc2d82939813401d4b2927a93e5ce285aa2f5d7d684747b856b2f4165a74da05c9cc79eee41edae077e0168a7d1f901a7e212dcd02001440e8e1116a78925daa1455b4d280d0721e9b9b5033bbaf81c2d3b88e288e9014ee59630dbf10'
+const URL_PDQ = '/limitespdq_wgs84.geojson'
 
-const PDQ_BASE_STYLE = { weight: 3, color: '#333333ff', dashArray: '4 4', fillOpacity: 0, };
-const PDQ_HOVER_STYLE = { weight: 4, color: '#1d4ed8', fillOpacity: 0.82 }
+const PDQ_BASE_STYLE = { weight: 3, color: '#333333ff', dashArray: '4 4', fill: true, fillOpacity: 0 };
+const PDQ_HOVER_STYLE = { weight: 4, color: '#1d4ed8', dashArray: '', fill: true, fillOpacity: 0.82 }
 
 function getPdqFillColor(count, maxCount) {
   if (!count || !maxCount) return '#e5e7eb'
@@ -46,12 +44,11 @@ function getPdqHoverStyle(count, maxCount) {
 export default function App() {
   const [raw, setRaw] = useState(null)
   const [category, setCategory] = useState('Vol de véhicule à moteur') // default car theft
-  const [year, setYear] = useState(String(new Date().getFullYear()))
+  const [year, setYear] = useState('')
   const [categories, setCategories] = useState([])
   const [years, setYears] = useState([])
   const [err, setErr] = useState(null)
   const [pdq, setPdq] = useState(null)  
-  const [pdqNames, setPdqNames] = useState({})
 
   // fetch ONCE
   useEffect(() => {
@@ -67,33 +64,22 @@ export default function App() {
           if (p.CATEGORIE) cats.add(p.CATEGORIE)
           if (typeof p.DATE === 'string' && p.DATE.length >= 4) yrs.add(p.DATE.slice(0,4))
         }
-        setCategories(Array.from(cats).sort((a,b)=>a.localeCompare(b)))
-        setYears(Array.from(yrs).sort((a,b)=>Number(b)-Number(a)))
+        const sortedCategories = Array.from(cats).sort((a,b)=>a.localeCompare(b))
+        const sortedYears = Array.from(yrs).sort((a,b)=>Number(b)-Number(a))
+
+        setCategories(sortedCategories)
+        setYears(sortedYears)
+        setYear(currentYear => currentYear || sortedYears[0] || '')
       })
       
-    const promise_2 = fetch(URL_PDQ_2)
+    const promise_2 = fetch(URL_PDQ)
       .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json() })
       .then(json => {
         setPdq(json)
       })
-
-    const promise_3 = fetch(URL_PDQ_NAME)
-      .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json() })
-      .then(json => {
-        const map = {}
-        for (const f of json.features || []) {
-          const p = f.properties || {}
-          if (p.DESC_LIEU && p.NOM_TEMP) {
-            const key = p.DESC_LIEU.split(" ").pop();
-            map[key] = p.NOM_TEMP
-          }
-        }
-        setPdqNames(map)
-      })
     
     var Promise1 = Promise.all(promise_1) //.catch(e => setErr(e.message))
     var Promise2 = Promise.all(promise_2) //.catch(e => setErr(e.message))
-    var Promise3 = Promise.all(promise_3) //.catch(e => setErr(e.message))
   }, [])
 
   // filter in memory
@@ -160,7 +146,7 @@ export default function App() {
               const id = feature?.properties?.PDQ
               const key = id != null ? String(id) : null
               const count = key ? (countsByPdq[key] || 0) : 0
-              const pdqName = key ? pdqNames[key] : null
+              const pdqName = feature?.properties?.Nom_PDQ || feature?.properties?.NOM_PDQ || null
               const percentage = totalFilteredRecords ? ((count / totalFilteredRecords) * 100).toFixed(1) : '0.0'
               const defaultStyle = getPdqStyle(count, maxPdqCount)
               const hoverStyle = getPdqHoverStyle(count, maxPdqCount)
@@ -185,7 +171,6 @@ export default function App() {
               layer.on({
                 mouseover: (e) => {
                   e.target.setStyle(hoverStyle)
-                  if (e.target.bringToFront) e.target.bringToFront()
                   const map = e.target._map
                   if (map) map.getContainer().style.cursor = 'pointer'
                 },
@@ -215,11 +200,6 @@ export default function App() {
           <label>
             {/* Année:{' '} */}
             <select value={year} onChange={e => setYear(e.target.value)}>
-              {!years.includes(String(new Date().getFullYear())) && (
-                <option value={String(new Date().getFullYear())}>
-                  {String(new Date().getFullYear())}
-                </option>
-              )}
               {years.map(y => (
                 <option key={y} value={y}>{y}</option>
               ))}
