@@ -69,20 +69,20 @@ export default function Chart({
 
   return (
     <div style={{ position: 'fixed', inset: 0,  zIndex: 1000, backgroundColor: '#b6b6b6af', display: 'flex', alignItems: 'center', justifyContent: 'center', }} >
-      <div style={{ background: '#fff', borderRadius: 8, padding: 16, maxWidth: '90vw',  maxHeight: '90vh', width: 800, boxShadow: '0 10px 25px rgba(0,0,0,0.2)', display: 'flex', flexDirection: 'column', }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginBottom: 12, flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            <select value={category} onChange={(e) => onCategoryChange(e.target.value)} style={{ border: '1px solid #d1d5db', borderRadius: 8, padding: '8px 10px', fontSize: 14 }}>
+      <div style={{ background: '#fff', borderRadius: 8, padding: 16, width: 'min(92vw, 800px)', maxHeight: 'min(86dvh, 90vh)', boxShadow: '0 10px 25px rgba(0,0,0,0.2)', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, marginBottom: 12, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', flex: '1 1 100%' }}>
+            <select value={category} onChange={(e) => onCategoryChange(e.target.value)} style={{ border: '1px solid #d1d5db', borderRadius: 8, padding: '8px 10px', fontSize: 14, minWidth: 0, flex: '1 1 220px' }}>
               {categories.map((item) => (
                 <option key={item} value={item}>{item}</option>
               ))}
             </select>
-            <select value={year} onChange={(e) => onYearChange(e.target.value)} style={{ border: '1px solid #d1d5db', borderRadius: 8, padding: '8px 10px', fontSize: 14 }}>
+            <select value={year} onChange={(e) => onYearChange(e.target.value)} style={{ border: '1px solid #d1d5db', borderRadius: 8, padding: '8px 10px', fontSize: 14, flex: '0 0 auto' }}>
               {years.map((item) => (
                 <option key={item} value={item}>{item}</option>
               ))}
             </select>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, color: '#374151' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, color: '#374151', flex: '1 1 100%' }}>
               <input
                 type="checkbox"
                 checked={comparePreviousYear}
@@ -92,18 +92,19 @@ export default function Chart({
               Comparer
             </label>
           </div>
-          <button onClick={onClose} style={{ border: 'none', background: 'transparent', fontSize: 18, cursor: 'pointer', }} >×</button>
+          <button onClick={onClose} style={{ border: 'none', background: 'transparent', fontSize: 18, cursor: 'pointer', lineHeight: 1, padding: 4, }} >×</button>
         </div>
-        <div style={{ flex: 1, minHeight: 300 }}>
+        <div style={{ flex: 1, minHeight: 260, height: 'min(56dvh, 480px)' }}>
             <Plot
                 data={plotData}
                 layout={{
-                title: { text: `${category} par mois${comparePreviousYear && previousYear ? ` (${year} vs ${previousYear})` : ` (${year})`}`, font: { size: 20 },},
-                xaxis: { title: { text: 'Mois', font: { size: 14 }  }, automargin: true, },
-                yaxis: { title: { text: "Nombre d'actes", font: { size: 14 }  }, automargin: true, },
-                margin: { t: 40, l: 50, r: 20, b: 50 },
+                title: { text: `${category} par mois${comparePreviousYear && previousYear ? ` (${year} vs ${previousYear})` : ` (${year})`}`, font: { size: 16 },},
+                xaxis: { title: { text: 'Mois', font: { size: 12 }  }, automargin: true, tickfont: { size: 10 } },
+                yaxis: { title: { text: "Nombre d'actes", font: { size: 12 }  }, automargin: true, tickfont: { size: 10 } },
+                margin: { t: 50, l: 45, r: 16, b: 45 },
                 autosize: true,
                 barmode: comparePreviousYear && previousYear ? 'group' : 'relative',
+                legend: { orientation: 'h', y: 1.08, x: 0, font: { size: 10 } },
                 }}
                 useResizeHandler={true}
                 style={{ width: '100%', height: '100%' }}

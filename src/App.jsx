@@ -296,9 +296,9 @@ export default function App() {
       </label>
 
       {showPDQ && (
-        <div className="absolute bottom-[calc(max(env(safe-area-inset-bottom),0.5rem)+4.5rem)] right-2 z-10 max-w-[11rem] rounded-lg border border-gray-300 bg-white/85 px-3 py-2 text-[11px] shadow backdrop-blur-sm sm:bottom-16 sm:right-3 sm:max-w-none sm:text-xs">
-          <div className="mb-2 font-semibold text-gray-700">Incidents par PDQ</div>
-          <div className="space-y-1 text-gray-600">
+        <div className="absolute bottom-[calc(max(env(safe-area-inset-bottom),0.5rem)+5.5rem)] left-2 right-2 z-10 rounded-lg border border-gray-300 mask-alpha px-3 py-2 text-[11px] shadow backdrop-blur-sm sm:bottom-16 sm:left-auto sm:right-3 sm:max-w-none sm:text-xs">
+          <div className="mb-2 text-center font-semibold text-gray-700 sm:text-left">Incidents par PDQ</div>
+          <div className="grid grid-cols-3 gap-2 text-gray-600 sm:block sm:space-y-1">
             <div className="flex items-center gap-2"><span className="inline-block h-3 w-3 rounded-sm" style={{ backgroundColor: '#fecaca' }} /> Faible</div>
             <div className="flex items-center gap-2"><span className="inline-block h-3 w-3 rounded-sm" style={{ backgroundColor: '#dc2626' }} /> Moyen</div>
             <div className="flex items-center gap-2"><span className="inline-block h-3 w-3 rounded-sm" style={{ backgroundColor: '#7f1d1d' }} /> Elevé</div>
