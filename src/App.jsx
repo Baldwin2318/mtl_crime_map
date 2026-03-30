@@ -196,7 +196,7 @@ export default function App() {
     : (crimeLoadProgress.phase === 'parsing' ? 'Traitement des donnees...' : 'Chargement...')
 
   return (
-    <div className="relative h-screen">
+    <div className="relative h-dvh min-h-dvh w-full overflow-hidden">
       {/* Loading overlay */}
       <div className={`fixed inset-0 z-[999] flex items-center justify-center bg-[#b6b6b6af] ${(filtered || err) ? 'invisible' : 'visible'}`}>
         <Loading text={loadingText} percent={crimeLoadProgress.percent} />
@@ -259,11 +259,11 @@ export default function App() {
       </MapContainer>
 
       {/* Header overlay */}
-      <header className="pointer-events-none absolute inset-x-0 top-0 z-10">
-        <div className="m-2 flex items-stretch gap-3 rounded-lg border border-gray-300 mask-alpha px-3 py-2 shadow backdrop-blur-sm pointer-events-auto">
+      <header className="pointer-events-none absolute inset-x-0 top-0 z-10 px-2 pt-[max(env(safe-area-inset-top),0.5rem)]">
+        <div className="flex flex-wrap items-stretch gap-2 rounded-lg border border-gray-300 mask-alpha px-3 py-2 shadow backdrop-blur-sm pointer-events-auto sm:flex-nowrap sm:gap-3">
           <label>
             {/* Catégorie:{' '} */}
-            <select className="w-30" value={category} onChange={e => setCategory(e.target.value)}>
+            <select className="max-w-[11rem] text-sm sm:max-w-none" value={category} onChange={e => setCategory(e.target.value)}>
               {categories.map(c => (
                 <option key={c} value={c}>{c}</option>
               ))}
@@ -272,7 +272,7 @@ export default function App() {
 
           <label>
             {/* Année:{' '} */}
-            <select value={year} onChange={e => setYear(e.target.value)}>
+            <select className="text-sm" value={year} onChange={e => setYear(e.target.value)}>
               {years.map(y => (
                 <option key={y} value={y}>{y}</option>
               ))}
@@ -280,23 +280,23 @@ export default function App() {
           </label>
 
           <button
-            className="bg-blue-500 hover:bg-blue-900 text-white rounded-xl px-3 text-sm"
+            className="rounded-xl bg-blue-500 px-3 text-sm text-white hover:bg-blue-900"
             onClick={() => setShowChart(true)}>
             Chart
           </button>
 
-          <span className="ml-auto text-[13px] text-[#555]">
+          <span className="w-full text-[13px] text-[#555] sm:ml-auto sm:w-auto">
             {filtered ? `${filtered.features.length.toLocaleString()} records` : ''}
           </span>
         </div>
       </header>
     
-      <label className=" rounded-lg border border-gray-300 mask-alpha text-gray-500 backdrop-blur-sm pointer-events-none absolute p-1 top-10 m-5 z-10">
+      <label className="pointer-events-none absolute left-2 top-[calc(max(env(safe-area-inset-top),0.5rem)+4.5rem)] z-10 rounded-lg border border-gray-300 mask-alpha p-1 text-xs text-gray-500 backdrop-blur-sm sm:left-5 sm:top-10 sm:text-sm">
         {category.toUpperCase()} {year}
       </label>
 
       {showPDQ && (
-        <div className="absolute right-3 bottom-16 z-10 rounded-lg border border-gray-300 bg-white/85 px-3 py-2 text-xs shadow backdrop-blur-sm">
+        <div className="absolute bottom-[calc(max(env(safe-area-inset-bottom),0.5rem)+4.5rem)] right-2 z-10 max-w-[11rem] rounded-lg border border-gray-300 bg-white/85 px-3 py-2 text-[11px] shadow backdrop-blur-sm sm:bottom-16 sm:right-3 sm:max-w-none sm:text-xs">
           <div className="mb-2 font-semibold text-gray-700">Incidents par PDQ</div>
           <div className="space-y-1 text-gray-600">
             <div className="flex items-center gap-2"><span className="inline-block h-3 w-3 rounded-sm" style={{ backgroundColor: '#fecaca' }} /> Faible</div>
@@ -347,9 +347,9 @@ export default function App() {
         </div>
       )}
 
-      <footer className="pointer-events-none absolute inset-x-0 bottom-0 z-10">
-        <div className="m-2 flex items-center justify-between gap-3 rounded-lg border border-gray-300 mask-alpha px-3 py-2 text-[12px] shadow backdrop-blur-sm pointer-events-auto">
-          <span className="text-center">
+      <footer className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-[max(env(safe-area-inset-bottom),0.5rem)]">
+        <div className="flex flex-col items-stretch gap-2 rounded-lg border border-gray-300 mask-alpha px-3 py-2 text-[11px] shadow backdrop-blur-sm pointer-events-auto sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:text-[12px]">
+          <span className="text-center sm:text-left">
             Données sur la criminalité © Ville de Montréal / SPVM – « Actes criminels », 
             licence CC BY 4.0. {tag}
           </span>
@@ -357,7 +357,7 @@ export default function App() {
             href={REPO_URL}
             target="_blank"
             rel="noreferrer"
-            className="rounded-lg bg-blue-500 px-3 py-1.5 text-white transition hover:bg-blue-900"
+            className="self-center rounded-lg bg-blue-500 px-3 py-1.5 text-white transition hover:bg-blue-900 sm:self-auto"
           >
             View Repo
           </a>
