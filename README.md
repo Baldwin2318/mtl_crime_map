@@ -57,3 +57,7 @@ npm run preview
 ## Current Tradeoff
 
 The app currently prioritizes direct public-data loading over cached or preprocessed data. That keeps the dataset source simple, but the initial load can still be slow because the browser downloads and parses the full GeoJSON file.
+
+## Disclaimer
+
+This project is not affiliated with the Ville de Montréal or the SPVM. It is a personal hobby project for learning and data exploration purposes only.
